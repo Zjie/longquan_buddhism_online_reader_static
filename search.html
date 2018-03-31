@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>demo</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <div id="result" class="container justify-content-md-center">
+      <div class="row" ><a href="/index.html" style="padding: 10px">佛经检索(V0.1)</a></div>
+      <div class="row">
+        <div class="col">检索结果，总共{{totalNum}}条相关记录:</div>
+      </div>
+      <div v-for="item in items" style="margin: 20px 0px 15px;border-left-color: #117a8b;border-left-width: 3px;border-left-style: solid;padding-left: 10px;">
+        <div class="row">
+          <div class="col">
+            <a href="#" v-on:click="detail(item.id)" v-if="item.rollName!=''">{{ item.rollName }}</a>
+            <a href="#" v-on:click="detail(item.id)" v-else>卷名称缺失</a>
+          </div>
+        </div>
+        <div class="row" style="font-size: 12px;font-style: italic;">
+          <div class="col">经：{{ item.name }}</div>
+          <div class="col">朝代：{{ item.dynasty }}</div>
+          <div class="col">译者：{{ item.translator }}</div>
+        </div>
+        <div class="row" style="font-size: 12px;">
+          <div class="col">前言：{{ item.preface }}</div>
+        </div>
+        <div class="row" style="font-size: 12px;">
+          <div class="col">正文：{{ item.rollText }}</div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+     $(function(){
+        var url = "/api/search";
+        var query = getQueryString('query');
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: {'query':query},
+          success: function(result,status,xhr) {
+            var searchResult = new Vue({
+              el: '#result',
+              data: {
+                items: result.result,
+                totalNum: result.totalNum,
+                curPage: result.curPage,
+                totalPage: result.totalPage
+              },
+              methods: {
+                detail: function(id) {
+                   window.location.href = "/detail.html?id=" + id;
+                }
+              }
+            })
+          },
+          dataType: 'json'
+        });
+      });
+      function getQueryString(name) { 
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+        var r = window.location.search.substr(1).match(reg); 
+        if (r != null) return r[2]; 
+        return null; 
+      }
+  </script>
+</html>
